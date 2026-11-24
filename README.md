@@ -38,6 +38,21 @@ SHA-256 hashes (`SHA256SUMS.txt`) and has a GitHub build provenance attestation:
 gh attestation verify log.exe --repo MkGut/log-recorder
 ```
 
+## Code signing policy
+
+log has applied for free code signing provided by [SignPath.io](https://about.signpath.io), certificate by
+[SignPath Foundation](https://signpath.org). Until that is approved, releases are unsigned (see above). Once it
+is, every Windows release is built by GitHub Actions from this repository and signed only after manual approval.
+
+Team roles:
+
+- Committers and reviewers: [MkGut](https://github.com/MkGut)
+- Approvers: [MkGut](https://github.com/MkGut)
+
+Privacy: this program will not transfer any information to other networked systems unless specifically
+requested by the user or the person installing or operating it, except the automatic update check described
+under [Privacy](#privacy), which only downloads files from this project's GitHub Releases and can be turned off.
+
 ## Develop
 
 Windows 11 (build 26100+), x64, .NET 10 SDK and the Visual Studio C++ build tools; see

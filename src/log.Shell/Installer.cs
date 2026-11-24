@@ -73,7 +73,7 @@ internal static unsafe class Installer
         if (exePath.Length == 0 || !ShouldOffer(args, exePath, dir, dataRootSet, Reg.GetDword(DeclineKey, "InstallDeclined") == 1))
             return false;
 
-        if (Ask("Install log for this user?\n\nlog will be copied to your Programs folder, get a Start menu shortcut and an entry in Installed apps. No administrator rights are needed.", 0x24) != 6)
+        if (Ask("Install log for this user?\n\nlog will be copied to your Programs folder, get a Start menu shortcut and an entry in Installed apps. No administrator rights are needed.\n\nThe installed copy checks this project's GitHub releases for signed updates about twice a day and installs them while log is idle. Nothing about you or your recordings is sent. Turn this off any time from the tray menu (Automatic updates).", 0x24) != 6)
         {
             Reg.SetDword(DeclineKey, "InstallDeclined", 1); // do not ask again; run from here
             return false;
