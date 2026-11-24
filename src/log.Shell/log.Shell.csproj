@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.26100.0</SupportedOSPlatformVersion>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>log</AssemblyName>
+    <Version>0.1.0</Version>
+    <RootNamespace>Log.Shell</RootNamespace>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\app-logo.ico</ApplicationIcon>
+    <PublishAot>true</PublishAot>
+    <IsAotCompatible>true</IsAotCompatible>
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <OptimizationPreference>Size</OptimizationPreference>
+    <StackTraceSupport>false</StackTraceSupport>
+    <UseSystemResourceKeys>true</UseSystemResourceKeys>
+    <IsPackable>false</IsPackable>
+    <!-- Win32 BOOL results (InvalidateRect, ShowWindow, ...) are deliberately ignored. -->
+    <NoWarn>$(NoWarn);CA1806</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\log.Core\log.Core.csproj" />
+    <ProjectReference Include="..\log.Engine\log.Engine.csproj" />
+    <ProjectReference Include="..\log.Windows\log.Windows.csproj" />
+    <InternalsVisibleTo Include="log.Shell.Tests" />
+  </ItemGroup>
+
+  <!-- The AOT native link embeds only the PDB file name, not the build machine path. -->
+  <ItemGroup>
+    <LinkerArg Include="/PDBALTPATH:%_PDB%" />
+  </ItemGroup>
+
+  <!-- Tray state icons, loaded by name in TrayIcon. The plain app icon comes from ApplicationIcon. -->
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\tray-*.ico" LogicalName="%(Filename)" />
+  </ItemGroup>
+
+  <!-- Native Media Foundation encoder bridge; still a separate file beside log.exe. -->
+  <PropertyGroup>
+    <MediaFoundationBridgePath Condition="'$(MediaFoundationBridgePath)' == ''">$(MSBuildProjectDirectory)\..\log.Windows\bin\Release\x64\log.MediaFoundationBridge.dll</MediaFoundationBridgePath>
+  </PropertyGroup>
+  <ItemGroup Condition="Exists('$(MediaFoundationBridgePath)')">
+    <Content Include="$(MediaFoundationBridgePath)" Link="log.MediaFoundationBridge.dll"
+             CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/log.Core/log.Core.csproj" />
+    <Project Path="src/log.Engine/log.Engine.csproj" />
+    <Project Path="src/log.Testing/log.Testing.csproj" />
+    <Project Path="src/log.Shell/log.Shell.csproj" />
+    <Project Path="src/log.Windows/log.Windows.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/log.Core.Tests/log.Core.Tests.csproj" />
+    <Project Path="tests/log.Integration.Tests/log.Integration.Tests.csproj" />
+    <Project Path="tests/log.Shell.Tests/log.Shell.Tests.csproj" />
+    <Project Path="tests/log.Windows.Tests/log.Windows.Tests.csproj" />
+  </Folder>
+</Solution>

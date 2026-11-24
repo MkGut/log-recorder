@@ -1,0 +1,42 @@
+# Build outputs
+bin/
+obj/
+artifacts/
+TestResults/
+coverage/
+
+# .NET and Visual Studio
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# NuGet
+*.nupkg
+packages/
+project.assets.json
+
+# Logs and local diagnostics
+*.log
+*.etl
+*.dmp
+*.mdmp
+*.local.json
+*.local.md
+
+# Secrets and local tool state: never commit
+*.pem
+*.pfx
+*.p12
+*.key
+*.snk
+.env
+.env.*
+metadata.json
+.claude/
+.impeccable/
+
+# Recordings and media from manual testing
+*.mp4

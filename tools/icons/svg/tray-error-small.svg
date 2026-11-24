@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="100%" height="100%" style="position:fixed;inset:0">
+<defs>
+  <linearGradient id="body" x1="0" y1="0" x2="0.25" y2="1">
+    <stop offset="0" stop-color="#8FE3FF"/><stop offset=".3" stop-color="#3FA4F5"/>
+    <stop offset=".68" stop-color="#2A46DC"/><stop offset="1" stop-color="#2420B4"/>
+  </linearGradient>
+  <linearGradient id="belly" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#F4FDFF"/><stop offset="1" stop-color="#9FDcff"/>
+  </linearGradient>
+  <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#E9FBFF"/><stop offset=".5" stop-color="#5E8BF5"/>
+    <stop offset="1" stop-color="#151A8C"/>
+  </linearGradient>
+  <linearGradient id="gloss" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset="1" stop-color="#fff" stop-opacity=".05"/>
+  </linearGradient>
+  <radialGradient id="glow" cx=".5" cy=".85" r=".6">
+    <stop offset="0" stop-color="#7DF0FF" stop-opacity=".75"/><stop offset="1" stop-color="#7DF0FF" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="bubble" cx=".35" cy=".3" r=".8">
+    <stop offset="0" stop-color="#fff" stop-opacity=".95"/><stop offset=".35" stop-color="#BDEFFF" stop-opacity=".55"/>
+    <stop offset="1" stop-color="#4BA8F5" stop-opacity=".75"/>
+  </radialGradient>
+  <radialGradient id="eye" cx=".4" cy=".35" r=".7">
+    <stop offset="0" stop-color="#27409E"/><stop offset="1" stop-color="#050B3C"/>
+  </radialGradient>
+  <filter id="soft" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="7"/></filter>
+  <clipPath id="whaleClip"><path d="M 22 150 C 22 96 66 70 120 70 C 160 70 186 90 200 114 C 207 104 210 94 209 84 C 198 78 184 70 176 52 C 193 50 206 56 213 67 C 221 56 235 49 250 51 C 248 73 238 90 225 99 C 232 150 204 220 122 222 C 62 222 22 198 22 150 Z"/></clipPath>
+</defs>
+<g transform="scale(.9)">
+<path d="M 22 150 C 22 96 66 70 120 70 C 160 70 186 90 200 114 C 207 104 210 94 209 84 C 198 78 184 70 176 52 C 193 50 206 56 213 67 C 221 56 235 49 250 51 C 248 73 238 90 225 99 C 232 150 204 220 122 222 C 62 222 22 198 22 150 Z" fill="url(#body)"/>
+<g clip-path="url(#whaleClip)">
+<ellipse cx="100" cy="226" rx="104" ry="48" fill="url(#belly)"/>
+<ellipse cx="120" cy="200" rx="120" ry="60" fill="url(#glow)"/>
+<ellipse cx="112" cy="100" rx="70" ry="24" fill="#fff" opacity=".55"/>
+</g>
+<path d="M 22 150 C 22 96 66 70 120 70 C 160 70 186 90 200 114 C 207 104 210 94 209 84 C 198 78 184 70 176 52 C 193 50 206 56 213 67 C 221 56 235 49 250 51 C 248 73 238 90 225 99 C 232 150 204 220 122 222 C 62 222 22 198 22 150 Z" fill="none" stroke="url(#rim)" stroke-width="9" stroke-linejoin="round"/>
+<circle cx="74" cy="150" r="17" fill="url(#eye)"/>
+<circle cx="68.9" cy="144.1" r="6.1" fill="#fff"/></g>
+<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFB3A1"/><stop offset="1" stop-color="#E2341D"/></linearGradient>
+<g transform="translate(124 124) scale(1.32)">
+  <circle cx="50" cy="50" r="45.5" fill="url(#bg)" stroke="#fff" stroke-width="9.1"/>
+  <rect x="43" y="22" width="14" height="36" rx="7" fill="#fff"/><circle cx="50" cy="73" r="8.5" fill="#fff"/>
+  
+</g></svg>

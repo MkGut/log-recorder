@@ -1,0 +1,88 @@
+name: Release
+
+# Push a version tag (git tag v0.2.0; git push origin v0.2.0) and this workflow builds the Native AOT
+# log.exe, runs the tests, signs the update manifest and publishes a GitHub Release. Installed copies pick
+# the release up automatically (see src/log.Shell/Updater.cs). Binaries are not Authenticode-signed unless
+# code signing is added (docs/development/release.md).
+on:
+  push:
+    tags: ['v*']
+
+permissions: {}
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write      # create the release
+      id-token: write      # build provenance attestation
+      attestations: write
+    steps:
+      - name: Check tag
+        shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          if ($env:TAG -notmatch '^v\d+\.\d+\.\d+$') { throw "Release tags look like v1.2.3, got '$env:TAG'." }
+          "VERSION=$($env:TAG.Substring(1))" >> $env:GITHUB_ENV
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
+
+      - name: Restore
+        run: dotnet restore log.slnx --configfile NuGet.Config
+
+      - name: Audit dependencies
+        shell: pwsh
+        run: |
+          $report = dotnet list log.slnx package --vulnerable --include-transitive --no-restore | Out-String
+          Write-Host $report
+          if ($report -match 'has the following vulnerable packages') { throw 'Vulnerable NuGet packages detected.' }
+
+      # -> src/log.Windows/bin/Release/x64/log.MediaFoundationBridge.dll, which log.Shell copies beside log.exe
+      - name: Build native Media Foundation bridge (x64)
+        run: msbuild src/log.Windows/MediaFoundationBridge.vcxproj /p:Configuration=Release /p:Platform=x64 /m
+
+      - name: Test
+        run: dotnet test log.slnx --configuration Release --no-restore
+
+      - name: Package
+        shell: pwsh
+        run: ./tools/Publish-Release.ps1 -Version $env:VERSION -Repository $env:GITHUB_REPOSITORY
+
+      # The only step that sees the update-signing key; nothing is built here.
+      - name: Sign update manifest
+        shell: pwsh
+        env:
+          LOG_UPDATE_SIGNING_KEY: ${{ secrets.UPDATE_SIGNING_KEY }}
+        run: ./tools/Sign-UpdateManifest.ps1 -Assets "artifacts/release/$env:VERSION/assets"
+
+      - name: Attest build provenance
+        uses: actions/attest-build-provenance@e8998f949152b193b063cb0ec769d69d929409be # v2.4.0
+        with:
+          subject-path: artifacts/release/${{ env.VERSION }}/assets/*
+
+      - name: Publish release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+        run: |
+          $files = Get-ChildItem "artifacts/release/$env:VERSION/assets" -File | ForEach-Object FullName
+          gh release create $env:TAG @files --repo $env:GITHUB_REPOSITORY --title "log $env:VERSION" --generate-notes

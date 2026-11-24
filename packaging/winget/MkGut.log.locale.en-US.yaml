@@ -1,0 +1,13 @@
+# Template.
+PackageIdentifier: MkGut.log
+PackageVersion: "{{VERSION}}"
+PackageLocale: en-US
+Publisher: MkGut
+PackageName: log
+PackageUrl: https://github.com/MkGut/log-recorder
+License: AGPL-3.0-only
+LicenseUrl: https://github.com/MkGut/log-recorder/blob/main/LICENSE
+ShortDescription: A quiet tray app that turns a day of work into a timelapse you can keep.
+Moniker: log
+ManifestType: defaultLocale
+ManifestVersion: 1.6.0

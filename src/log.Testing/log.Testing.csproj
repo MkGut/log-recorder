@@ -1,0 +1,10 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>log.Testing</AssemblyName>
+    <RootNamespace>Log.Testing</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\log.Core\log.Core.csproj" />
+  </ItemGroup>
+</Project>

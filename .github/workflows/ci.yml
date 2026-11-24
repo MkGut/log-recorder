@@ -1,0 +1,131 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+# Cancel an in-flight run when a newer commit lands on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: '1'
+  DOTNET_NOLOGO: '1'
+
+jobs:
+  verify:
+    runs-on: windows-latest
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
+
+      - name: Restore
+        run: dotnet restore log.slnx --configfile NuGet.Config
+
+      # `dotnet list --vulnerable` exits 0 even when advisories exist, so fail explicitly.
+      - name: Audit dependencies
+        shell: pwsh
+        run: |
+          $report = dotnet list log.slnx package --vulnerable --include-transitive --no-restore | Out-String
+          Write-Host $report
+          if ($report -match 'has the following vulnerable packages') { throw 'Vulnerable NuGet packages detected.' }
+
+      # log.Shell copies this DLL beside its output; the real-engine test needs it to render.
+      - name: Build native Media Foundation bridge (x64)
+        run: msbuild src/log.Windows/MediaFoundationBridge.vcxproj /p:Configuration=Release /p:Platform=x64 /m
+
+      - name: Build
+        run: dotnet build log.slnx --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test log.slnx --configuration Release --no-build --no-restore --logger trx --results-directory artifacts/test-results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: test-results
+          path: artifacts/test-results/**/*.trx
+          if-no-files-found: warn
+
+  # Software Bill of Materials for log.exe, isolated so an SBOM tooling hiccup never masks build/test.
+  sbom:
+    runs-on: windows-latest
+    needs: verify
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Restore
+        run: dotnet restore log.slnx --configfile NuGet.Config
+
+      - name: Generate CycloneDX SBOM
+        shell: pwsh
+        run: |
+          dotnet tool install --global CycloneDX --version 6.3.2
+          dotnet CycloneDX src/log.Shell/log.Shell.csproj -o artifacts/sbom -F Json
+          Get-ChildItem artifacts/sbom
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: sbom
+          path: artifacts/sbom/**
+          if-no-files-found: error
+
+  # Native AOT log.exe -> the release assets (unsigned manifest; only the Release workflow signs it).
+  package:
+    runs-on: windows-latest
+    needs: verify
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@67a3573c9a986a3f9c594539f4ab511d57bb3ce9 # v4.3.1
+        with:
+          dotnet-version: 10.0.400
+
+      - name: Add MSBuild to PATH
+        uses: microsoft/setup-msbuild@6fb02220983dee41ce7ae257b6f4d8f9bf5ed4ce # v2.0.0
+
+      - name: Build native Media Foundation bridge (x64)
+        run: msbuild src/log.Windows/MediaFoundationBridge.vcxproj /p:Configuration=Release /p:Platform=x64 /m
+
+      - name: Publish log.exe (Native AOT) and package
+        shell: pwsh
+        run: ./tools/Publish-Release.ps1 -Repository $env:GITHUB_REPOSITORY
+
+      - name: Upload package
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: log-package
+          path: artifacts/release/*/assets/**
+          if-no-files-found: error

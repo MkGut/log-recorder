@@ -1,0 +1,6 @@
+# Template. tools/Publish-Release.ps1 fills the {{...}} values into artifacts/release/winget.
+PackageIdentifier: MkGut.log
+PackageVersion: "{{VERSION}}"
+DefaultLocale: en-US
+ManifestType: version
+ManifestVersion: 1.6.0

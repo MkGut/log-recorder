@@ -1,0 +1,14 @@
+# Template. The zip holds log.exe and log.MediaFoundationBridge.dll side by side; winget links log.exe as `log`.
+PackageIdentifier: MkGut.log
+PackageVersion: "{{VERSION}}"
+InstallerType: zip
+NestedInstallerType: portable
+NestedInstallerFiles:
+- RelativeFilePath: log.exe
+  PortableCommandAlias: log
+Installers:
+- Architecture: x64
+  InstallerUrl: "{{URL}}"
+  InstallerSha256: "{{SHA256}}"
+ManifestType: installer
+ManifestVersion: 1.6.0
